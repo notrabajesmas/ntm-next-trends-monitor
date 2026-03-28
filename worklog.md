@@ -111,9 +111,9 @@
 ## 🔑 Variables de Entorno Configuradas
 
 ```env
-GOOGLE_API_KEY=AIzaSyBYrKAJ9DNZ1qHwZrw-9A2FN-AFyV6a_MA
-PADDLE_CLIENT_TOKEN=live_42067eb1e7be3c2f8b0093ade94
-PADDLE_API_KEY=pdl_live_apikey_01km5abxw0he3wq8b2r1shnhk1_...
+GOOGLE_API_KEY=tu_google_api_key_aqui
+PADDLE_CLIENT_TOKEN=tu_paddle_client_token_aqui
+PADDLE_API_KEY=tu_paddle_api_key_aqui
 ```
 
 ---
