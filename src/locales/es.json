@@ -1,0 +1,214 @@
+{
+  "common": {
+    "appName": "NTM - Next Trends Monitor",
+    "tagline": "Tu kit completo de análisis digital",
+    "poweredByAI": "Potenciado por IA",
+    "getStarted": "Comenzar Gratis",
+    "learnMore": "Saber Más",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "download": "Descargar",
+    "export": "Exportar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos"
+  },
+  "nav": {
+    "home": "Inicio",
+    "tools": "Herramientas",
+    "pricing": "Precios",
+    "api": "API",
+    "docs": "Documentación",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Descubre oportunidades que",
+    "titleHighlight": "otros no ven",
+    "description": "Encuentra negocios sin presencia digital, detecta tendencias antes que nadie y genera reportes profesionales automáticamente.",
+    "feature1": "100% Automatizado",
+    "feature2": "Análisis en segundos",
+    "feature3": "Datos globales",
+    "feature4": "Reportes PDF"
+  },
+  "tools": {
+    "businessScanner": {
+      "name": "Scanner de Negocios",
+      "description": "Encuentra negocios sin presencia digital en cualquier zona",
+      "title": "Scanner de Negocios",
+      "location": "Zona geográfica",
+      "locationPlaceholder": "Ej: Palermo, Buenos Aires",
+      "businessType": "Tipo de negocio",
+      "allTypes": "Todos los tipos",
+      "restaurants": "Restaurantes",
+      "stores": "Tiendas",
+      "services": "Servicios",
+      "health": "Salud",
+      "fitness": "Fitness",
+      "analyzeButton": "Analizar Zona",
+      "analyzing": "Analizando zona...",
+      "results": "Resultados",
+      "opportunities": "oportunidades",
+      "noWeb": "Sin Web",
+      "hasWeb": "Con Web",
+      "creditsInfo": "Este análisis consume {credits} crédito(s). Tienes {available} créditos disponibles.",
+      "exportCSV": "Exportar CSV",
+      "generatePDF": "Generar PDF"
+    },
+    "trendsHunter": {
+      "name": "Cazador de Tendencias",
+      "description": "Detecta tendencias emergentes antes que tu competencia",
+      "title": "Cazador de Tendencias",
+      "keyword": "Nicho o palabra clave",
+      "keywordPlaceholder": "Ej: marketing digital, fitness, finanzas",
+      "platform": "Plataforma",
+      "allPlatforms": "Todas las plataformas",
+      "huntButton": "Cazar Tendencias",
+      "hunting": "Analizando tendencias...",
+      "hotToday": "Tendencias detectadas hoy:",
+      "hot": "Caliente",
+      "rising": "En alza",
+      "declining": "En declive",
+      "searchVolume": "Vol. de búsqueda",
+      "growth": "Crecimiento",
+      "competition": "Competencia",
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "score": "Score"
+    },
+    "digitalAuditor": {
+      "name": "Auditor Digital",
+      "title": "Auditor Digital",
+      "description": "Analiza la salud digital completa de cualquier negocio",
+      "businessName": "Nombre del negocio",
+      "businessNamePlaceholder": "Ej: Restaurante La Parrilla",
+      "website": "Sitio web (opcional)",
+      "websitePlaceholder": "Ej: laparrilla.com.ar",
+      "startAudit": "Iniciar Auditoría",
+      "auditing": "Auditando negocio...",
+      "overallScore": "Score General",
+      "webPresence": "Presencia Web",
+      "googleBusiness": "Google My Business",
+      "socialMedia": "Redes Sociales",
+      "onlineReputation": "Reputación Online",
+      "localSEO": "SEO Local",
+      "recommendations": "Recomendaciones"
+    },
+    "reports": {
+      "name": "Reportes PDF",
+      "title": "Generador de Reportes",
+      "description": "Crea reportes PDF profesionales automáticamente",
+      "reportTitle": "Título del reporte",
+      "reportTitlePlaceholder": "Ej: Análisis Q1 2024 - Palermo",
+      "reportType": "Tipo de reporte",
+      "selectType": "Seleccionar tipo",
+      "notes": "Notas adicionales (opcional)",
+      "notesPlaceholder": "Agrega contexto o instrucciones especiales para el reporte...",
+      "generateButton": "Generar Reporte",
+      "generating": "Generando PDF...",
+      "myReports": "Mis Reportes",
+      "ready": "Listo",
+      "processing": "Procesando",
+      "templates": "Plantillas disponibles:"
+    }
+  },
+  "pricing": {
+    "title": "Planes simples, resultados poderosos",
+    "subtitle": "Comienza gratis, escala cuando lo necesites",
+    "currency": "USD",
+    "perMonth": "/mes",
+    "popular": "Más Popular",
+    "plans": {
+      "free": {
+        "name": "Gratis",
+        "description": "Para probar la plataforma",
+        "price": "0",
+        "features": [
+          "3 análisis por mes",
+          "Resultados básicos",
+          "Sin reportes PDF"
+        ],
+        "cta": "Empezar Gratis"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Para profesionales y agencias",
+        "price": "29",
+        "features": [
+          "100 análisis por mes",
+          "Análisis IA profundo",
+          "Reportes PDF ilimitados",
+          "Exportar a CSV"
+        ],
+        "cta": "Obtener Pro"
+      },
+      "enterprise": {
+        "name": "Empresa",
+        "description": "Para equipos grandes",
+        "price": "99",
+        "features": [
+          "Análisis ilimitados",
+          "Acceso API",
+          "Soporte prioritario",
+          "White-label disponible"
+        ],
+        "cta": "Contactar Ventas"
+      }
+    },
+    "securePayments": "Pagos seguros con Paddle",
+    "cancelAnytime": "Cancelá cuando quieras"
+  },
+  "auth": {
+    "createAccount": "Crear Cuenta",
+    "login": "Iniciar Sesión",
+    "registerDescription": "Únete a NTM y comienza a descubrir oportunidades",
+    "loginDescription": "Accede a tu cuenta para continuar",
+    "name": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "email": "Email",
+    "emailPlaceholder": "tu@email.com",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Mínimo 6 caracteres",
+    "yourPassword": "Tu contraseña",
+    "registerButton": "Crear Cuenta",
+    "loginButton": "Iniciar Sesión",
+    "andContinue": "y continuar al pago",
+    "welcome": "¡Bienvenido!",
+    "accountCreated": "Cuenta creada exitosamente",
+    "loggedIn": "Sesión iniciada correctamente"
+  },
+  "payment": {
+    "title": "Finalizar Compra",
+    "subtitle": "Estás a punto de activar tu plan",
+    "plan": "Plan",
+    "perMonth": "/mes",
+    "unlimited": "Análisis ilimitados",
+    "analysesPerMonth": "análisis por mes",
+    "securePayment": "Pago seguro con Paddle",
+    "cancelAnytime": "Cancelá cuando quieras",
+    "automaticBilling": "Facturación automática",
+    "payWithPaddle": "Pagar con Paddle",
+    "termsAgreement": "Al continuar, aceptás nuestros términos y condiciones",
+    "globalPayments": "Pagos globales procesados"
+  },
+  "footer": {
+    "copyright": "© 2024 Next Trends Monitor",
+    "terms": "Términos",
+    "privacy": "Privacidad",
+    "apiDocs": "API Docs"
+  },
+  "stats": {
+    "businessesAnalyzed": "Negocios analizados",
+    "trendsDetected": "Tendencias detectadas",
+    "reportsGenerated": "Reportes generados",
+    "satisfaction": "Satisfacción"
+  }
+}

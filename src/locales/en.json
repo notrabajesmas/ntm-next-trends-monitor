@@ -1,0 +1,214 @@
+{
+  "common": {
+    "appName": "NTM - Next Trends Monitor",
+    "tagline": "Your complete digital analysis toolkit",
+    "poweredByAI": "Powered by AI",
+    "getStarted": "Get Started Free",
+    "learnMore": "Learn More",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "download": "Download",
+    "export": "Export",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All"
+  },
+  "nav": {
+    "home": "Home",
+    "tools": "Tools",
+    "pricing": "Pricing",
+    "api": "API",
+    "docs": "Documentation",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Discover opportunities",
+    "titleHighlight": "others miss",
+    "description": "Find businesses without digital presence, detect trends before anyone else, and generate professional reports automatically.",
+    "feature1": "100% Automated",
+    "feature2": "Analysis in seconds",
+    "feature3": "Global data",
+    "feature4": "PDF Reports"
+  },
+  "tools": {
+    "businessScanner": {
+      "name": "Business Scanner",
+      "description": "Find businesses without digital presence in any area",
+      "title": "Business Scanner",
+      "location": "Location",
+      "locationPlaceholder": "e.g.: Manhattan, New York",
+      "businessType": "Business Type",
+      "allTypes": "All types",
+      "restaurants": "Restaurants",
+      "stores": "Stores",
+      "services": "Services",
+      "health": "Health",
+      "fitness": "Fitness",
+      "analyzeButton": "Analyze Area",
+      "analyzing": "Analyzing area...",
+      "results": "Results",
+      "opportunities": "opportunities",
+      "noWeb": "No Website",
+      "hasWeb": "Has Website",
+      "creditsInfo": "This analysis uses {credits} credit(s). You have {available} credits available.",
+      "exportCSV": "Export CSV",
+      "generatePDF": "Generate PDF"
+    },
+    "trendsHunter": {
+      "name": "Trends Hunter",
+      "description": "Detect emerging trends before your competition",
+      "title": "Trends Hunter",
+      "keyword": "Keyword or niche",
+      "keywordPlaceholder": "e.g.: digital marketing, fitness, finance",
+      "platform": "Platform",
+      "allPlatforms": "All platforms",
+      "huntButton": "Hunt Trends",
+      "hunting": "Analyzing trends...",
+      "hotToday": "Trends detected today:",
+      "hot": "Hot",
+      "rising": "Rising",
+      "declining": "Declining",
+      "searchVolume": "Search Volume",
+      "growth": "Growth",
+      "competition": "Competition",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "score": "Score"
+    },
+    "digitalAuditor": {
+      "name": "Digital Auditor",
+      "title": "Digital Auditor",
+      "description": "Analyze the complete digital health of any business",
+      "businessName": "Business Name",
+      "businessNamePlaceholder": "e.g.: Joe's Restaurant",
+      "website": "Website (optional)",
+      "websitePlaceholder": "e.g.: joesrestaurant.com",
+      "startAudit": "Start Audit",
+      "auditing": "Auditing business...",
+      "overallScore": "Overall Score",
+      "webPresence": "Web Presence",
+      "googleBusiness": "Google My Business",
+      "socialMedia": "Social Media",
+      "onlineReputation": "Online Reputation",
+      "localSEO": "Local SEO",
+      "recommendations": "Recommendations"
+    },
+    "reports": {
+      "name": "PDF Reports",
+      "title": "Report Generator",
+      "description": "Create professional PDF reports automatically",
+      "reportTitle": "Report Title",
+      "reportTitlePlaceholder": "e.g.: Q1 2024 Analysis - Manhattan",
+      "reportType": "Report Type",
+      "selectType": "Select type",
+      "notes": "Additional notes (optional)",
+      "notesPlaceholder": "Add context or special instructions for the report...",
+      "generateButton": "Generate Report",
+      "generating": "Generating PDF...",
+      "myReports": "My Reports",
+      "ready": "Ready",
+      "processing": "Processing",
+      "templates": "Available templates:"
+    }
+  },
+  "pricing": {
+    "title": "Simple plans, powerful results",
+    "subtitle": "Start free, scale when you need",
+    "currency": "USD",
+    "perMonth": "/month",
+    "popular": "Most Popular",
+    "plans": {
+      "free": {
+        "name": "Free",
+        "description": "To try the platform",
+        "price": "0",
+        "features": [
+          "3 analyses per month",
+          "Basic results",
+          "No PDF reports"
+        ],
+        "cta": "Start Free"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "For professionals and agencies",
+        "price": "29",
+        "features": [
+          "100 analyses per month",
+          "Deep AI analysis",
+          "Unlimited PDF reports",
+          "Export to CSV"
+        ],
+        "cta": "Get Pro"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "For large teams",
+        "price": "99",
+        "features": [
+          "Unlimited analyses",
+          "API access",
+          "Priority support",
+          "White-label available"
+        ],
+        "cta": "Contact Sales"
+      }
+    },
+    "securePayments": "Secure payments with Paddle",
+    "cancelAnytime": "Cancel anytime"
+  },
+  "auth": {
+    "createAccount": "Create Account",
+    "login": "Log In",
+    "registerDescription": "Join NTM and start discovering opportunities",
+    "loginDescription": "Access your account to continue",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "password": "Password",
+    "passwordPlaceholder": "Minimum 6 characters",
+    "yourPassword": "Your password",
+    "registerButton": "Create Account",
+    "loginButton": "Log In",
+    "andContinue": "and continue to payment",
+    "welcome": "Welcome!",
+    "accountCreated": "Account created successfully",
+    "loggedIn": "Logged in successfully"
+  },
+  "payment": {
+    "title": "Complete Purchase",
+    "subtitle": "You're about to activate your plan",
+    "plan": "Plan",
+    "perMonth": "/month",
+    "unlimited": "Unlimited analyses",
+    "analysesPerMonth": "analyses per month",
+    "securePayment": "Secure payment with Paddle",
+    "cancelAnytime": "Cancel anytime",
+    "automaticBilling": "Automatic billing",
+    "payWithPaddle": "Pay with Paddle",
+    "termsAgreement": "By continuing, you accept our terms and conditions",
+    "globalPayments": "Global payments processed"
+  },
+  "footer": {
+    "copyright": "© 2024 Next Trends Monitor",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "apiDocs": "API Docs"
+  },
+  "stats": {
+    "businessesAnalyzed": "Businesses analyzed",
+    "trendsDetected": "Trends detected",
+    "reportsGenerated": "Reports generated",
+    "satisfaction": "Satisfaction"
+  }
+}

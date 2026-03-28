@@ -1,0 +1,186 @@
+// Next Trends Monitor (NTM) - Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USUARIOS Y AUTENTICACIÓN
+// ============================================
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String?
+  password        String?
+  image           String?
+  planType        String   @default("free") // free, pro, enterprise
+  stripeCustomerId String?
+  stripeSubscriptionId String?
+  credits         Int      @default(3) // Créditos gratuitos para empezar
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relaciones
+  analysisRequests AnalysisRequest[]
+  reports          Report[]
+  leads            Lead[]
+  
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================
+// ANÁLISIS Y REPORTES
+// ============================================
+
+model AnalysisRequest {
+  id                String   @id @default(cuid())
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id])
+  toolType          String   // scanner, trends, auditor
+  inputData         String   // JSON con los parámetros de entrada
+  status            String   @default("pending") // pending, processing, completed, failed
+  rawData           String?  // JSON con datos crudos obtenidos
+  aiAnalysis        String?  // Análisis generado por IA
+  creditsUsed       Int      @default(1)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("analysis_requests")
+}
+
+model Report {
+  id              String   @id @default(cuid())
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+  title           String
+  reportType      String   // business_scan, trend_analysis, digital_audit
+  content         String   // Markdown content
+  pdfUrl          String?  // URL del PDF generado
+  isPublic        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  
+  @@map("reports")
+}
+
+// ============================================
+// DATOS DE HERRAMIENTAS
+// ============================================
+
+model BusinessLead {
+  id              String   @id @default(cuid())
+  name            String
+  address         String?
+  phone           String?
+  website         String?
+  email           String?
+  businessType    String?
+  googleRating    Float?
+  reviewCount     Int?
+  hasWebsite      Boolean  @default(false)
+  hasClaimed      Boolean  @default(false)
+  issues          String?  // JSON con problemas detectados
+  latitude        Float?
+  longitude       Float?
+  analyzedAt      DateTime @default(now())
+  
+  @@map("business_leads")
+}
+
+model TrendData {
+  id              String   @id @default(cuid())
+  keyword         String
+  platform        String   // google, twitter, reddit, youtube
+  searchVolume    Int?
+  growthRate      Float?
+  competition     String?  // low, medium, high
+  trendScore      Float?   // 0-100
+  relatedKeywords String? // JSON array
+  rawData         String?  // JSON completo
+  analyzedAt      DateTime @default(now())
+  
+  @@map("trend_data")
+}
+
+model Lead {
+  id                String   @id @default(cuid())
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id])
+  businessName      String
+  businessEmail     String?
+  businessPhone     String?
+  niche             String?
+  source            String?  // google_maps, linkedin, etc
+  outreachStatus    String   @default("not_contacted") // not_contacted, sent, opened, clicked, converted
+  lastContactedAt   DateTime?
+  notes             String?
+  createdAt         DateTime @default(now())
+  
+  @@map("leads")
+}
+
+// ============================================
+// SISTEMA Y CONFIGURACIÓN
+// ============================================
+
+model SystemConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+  
+  @@map("system_config")
+}
+
+model ApiUsage {
+  id          String   @id @default(cuid())
+  service     String   // openai, google, stripe
+  endpoint    String
+  tokensUsed  Int?
+  cost        Float?
+  createdAt   DateTime @default(now())
+  
+  @@map("api_usage")
+}

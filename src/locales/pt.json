@@ -1,0 +1,174 @@
+{
+  "common": {
+    "appName": "NTM - Next Trends Monitor",
+    "tagline": "Seu kit completo de análise digital",
+    "poweredByAI": "Powered by AI",
+    "getStarted": "Começar Grátis",
+    "learnMore": "Saiba Mais",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "view": "Ver",
+    "download": "Baixar",
+    "export": "Exportar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos"
+  },
+  "nav": {
+    "home": "Início",
+    "tools": "Ferramentas",
+    "pricing": "Preços",
+    "api": "API",
+    "docs": "Documentação",
+    "login": "Entrar",
+    "signup": "Cadastrar",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Descubra oportunidades que",
+    "titleHighlight": "outros não veem",
+    "description": "Encontre negócios sem presença digital, detecte tendências antes de todos e gere relatórios profissionais automaticamente.",
+    "feature1": "100% Automatizado",
+    "feature2": "Análise em segundos",
+    "feature3": "Dados globais",
+    "feature4": "Relatórios PDF"
+  },
+  "tools": {
+    "businessScanner": {
+      "name": "Scanner de Negócios",
+      "description": "Encontre negócios sem presença digital em qualquer área",
+      "title": "Scanner de Negócios",
+      "location": "Localização",
+      "locationPlaceholder": "Ex: Pinheiros, São Paulo",
+      "businessType": "Tipo de negócio",
+      "allTypes": "Todos os tipos",
+      "restaurants": "Restaurantes",
+      "stores": "Lojas",
+      "services": "Serviços",
+      "health": "Saúde",
+      "fitness": "Fitness",
+      "analyzeButton": "Analisar Área",
+      "analyzing": "Analisando área...",
+      "results": "Resultados",
+      "opportunities": "oportunidades"
+    },
+    "trendsHunter": {
+      "name": "Caçador de Tendências",
+      "description": "Detecte tendências emergentes antes da concorrência",
+      "title": "Caçador de Tendências",
+      "keyword": "Palavra-chave ou nicho",
+      "keywordPlaceholder": "Ex: marketing digital, fitness, finanças",
+      "platform": "Plataforma",
+      "allPlatforms": "Todas as plataformas",
+      "huntButton": "Caçar Tendências"
+    },
+    "digitalAuditor": {
+      "name": "Auditor Digital",
+      "title": "Auditor Digital",
+      "description": "Analise a saúde digital completa de qualquer negócio",
+      "businessName": "Nome do negócio",
+      "businessNamePlaceholder": "Ex: Restaurante do João",
+      "website": "Site (opcional)",
+      "websitePlaceholder": "Ex: restaurantejoao.com.br",
+      "startAudit": "Iniciar Auditoria"
+    },
+    "reports": {
+      "name": "Relatórios PDF",
+      "title": "Gerador de Relatórios",
+      "description": "Crie relatórios PDF profissionais automaticamente",
+      "reportTitle": "Título do relatório",
+      "reportTitlePlaceholder": "Ex: Análise Q1 2024 - Pinheiros",
+      "reportType": "Tipo de relatório",
+      "selectType": "Selecionar tipo",
+      "notes": "Notas adicionais (opcional)",
+      "notesPlaceholder": "Adicione contexto ou instruções especiais para o relatório...",
+      "generateButton": "Gerar Relatório"
+    }
+  },
+  "pricing": {
+    "title": "Planos simples, resultados poderosos",
+    "subtitle": "Comece grátis, escale quando precisar",
+    "currency": "USD",
+    "perMonth": "/mês",
+    "popular": "Mais Popular",
+    "plans": {
+      "free": {
+        "name": "Grátis",
+        "description": "Para testar a plataforma",
+        "price": "0",
+        "features": [
+          "3 análises por mês",
+          "Resultados básicos",
+          "Sem relatórios PDF"
+        ],
+        "cta": "Começar Grátis"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Para profissionais e agências",
+        "price": "29",
+        "features": [
+          "100 análises por mês",
+          "Análise IA profunda",
+          "Relatórios PDF ilimitados",
+          "Exportar para CSV"
+        ],
+        "cta": "Obter Pro"
+      },
+      "enterprise": {
+        "name": "Empresa",
+        "description": "Para grandes equipes",
+        "price": "99",
+        "features": [
+          "Análises ilimitadas",
+          "Acesso API",
+          "Suporte prioritário",
+          "White-label disponível"
+        ],
+        "cta": "Contatar Vendas"
+      }
+    },
+    "securePayments": "Pagamentos seguros com Paddle",
+    "cancelAnytime": "Cancele quando quiser"
+  },
+  "auth": {
+    "createAccount": "Criar Conta",
+    "login": "Entrar",
+    "registerDescription": "Junte-se ao NTM e comece a descobrir oportunidades",
+    "loginDescription": "Acesse sua conta para continuar",
+    "name": "Nome",
+    "namePlaceholder": "Seu nome",
+    "email": "Email",
+    "emailPlaceholder": "seu@email.com",
+    "password": "Senha",
+    "passwordPlaceholder": "Mínimo 6 caracteres",
+    "registerButton": "Criar Conta",
+    "loginButton": "Entrar"
+  },
+  "payment": {
+    "title": "Finalizar Compra",
+    "subtitle": "Você está prestes a ativar seu plano",
+    "plan": "Plano",
+    "perMonth": "/mês",
+    "securePayment": "Pagamento seguro com Paddle",
+    "cancelAnytime": "Cancele quando quiser",
+    "payWithPaddle": "Pagar com Paddle"
+  },
+  "footer": {
+    "copyright": "© 2024 Next Trends Monitor",
+    "terms": "Termos",
+    "privacy": "Privacidade",
+    "apiDocs": "API Docs"
+  },
+  "stats": {
+    "businessesAnalyzed": "Negócios analisados",
+    "trendsDetected": "Tendências detectadas",
+    "reportsGenerated": "Relatórios gerados",
+    "satisfaction": "Satisfação"
+  }
+}
