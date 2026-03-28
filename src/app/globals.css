@@ -120,3 +120,320 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ============================================
+   NTM - Animations & Transitions
+   ============================================ */
+
+/* Card Hover Effects */
+.ntm-card {
+  @apply transition-all duration-300 ease-out;
+}
+
+.ntm-card:hover {
+  transform: scale(1.02);
+  @apply shadow-lg shadow-emerald-500/10;
+}
+
+/* Button Effects */
+.ntm-button {
+  @apply transition-all duration-200 ease-out;
+}
+
+.ntm-button:hover {
+  filter: brightness(1.1);
+}
+
+.ntm-button:active {
+  transform: scale(0.98);
+}
+
+/* Modal Animations */
+.ntm-modal-enter {
+  animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.ntm-modal-exit {
+  animation: modalFadeOut 0.2s ease-in forwards;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+}
+
+/* Stagger Animation for Lists */
+.ntm-list-item {
+  animation: staggerFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+.ntm-list-item:nth-child(1) { animation-delay: 0.05s; }
+.ntm-list-item:nth-child(2) { animation-delay: 0.1s; }
+.ntm-list-item:nth-child(3) { animation-delay: 0.15s; }
+.ntm-list-item:nth-child(4) { animation-delay: 0.2s; }
+.ntm-list-item:nth-child(5) { animation-delay: 0.25s; }
+.ntm-list-item:nth-child(6) { animation-delay: 0.3s; }
+.ntm-list-item:nth-child(7) { animation-delay: 0.35s; }
+.ntm-list-item:nth-child(8) { animation-delay: 0.4s; }
+.ntm-list-item:nth-child(9) { animation-delay: 0.45s; }
+.ntm-list-item:nth-child(10) { animation-delay: 0.5s; }
+
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse Animation for Status */
+.ntm-pulse {
+  animation: ntmPulse 2s ease-in-out infinite;
+}
+
+@keyframes ntmPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Shimmer Loading Effect */
+.ntm-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(16, 185, 129, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Slide Animations */
+.ntm-slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.ntm-slide-in-left {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+.ntm-slide-out-right {
+  animation: slideOutRight 0.3s ease-in forwards;
+}
+
+.ntm-slide-out-left {
+  animation: slideOutLeft 0.3s ease-in forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+/* Bounce Animation */
+.ntm-bounce {
+  animation: bounce 0.5s ease-out;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Fade In Up */
+.ntm-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade In Scale */
+.ntm-fade-in-scale {
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Spin Slow */
+.ntm-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Glow Effect */
+.ntm-glow {
+  position: relative;
+}
+
+.ntm-glow::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+  opacity: 0;
+  z-index: -1;
+  filter: blur(8px);
+  transition: opacity 0.3s ease;
+}
+
+.ntm-glow:hover::after {
+  opacity: 0.5;
+}
+
+/* Custom Scrollbar */
+.ntm-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.ntm-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ntm-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.3);
+  border-radius: 3px;
+}
+
+.ntm-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.5);
+}
+
+/* Focus Ring */
+.ntm-focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5);
+}
+
+/* Transition Utilities */
+.transition-fast {
+  transition-duration: 150ms;
+}
+
+.transition-normal {
+  transition-duration: 300ms;
+}
+
+.transition-slow {
+  transition-duration: 500ms;
+}
+
+/* Hover Lift Effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+              0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Color Transition */
+.color-transition {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}

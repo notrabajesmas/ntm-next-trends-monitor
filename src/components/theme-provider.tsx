@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, createContext, useContext, ReactNode } from "react";
+import { useState, useEffect, createContext, useContext, ReactNode, useSyncExternalStore } from "react";
 
 type Theme = "dark" | "light";
 
@@ -12,30 +12,46 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Funciones para localStorage con SSR
+const getLocalStorageTheme = (): Theme => {
+  if (typeof window === 'undefined') return 'dark';
+  return (localStorage.getItem("ntm_theme") as Theme) || "dark";
+};
+
+const setLocalStorageTheme = (theme: Theme) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem("ntm_theme", theme);
+  }
+};
+
+// Hook para usar con SSR
+function useThemeStorage() {
+  return useSyncExternalStore(
+    (onChange) => {
+      window.addEventListener('storage', onChange);
+      return () => window.removeEventListener('storage', onChange);
+    },
+    getLocalStorageTheme,
+    () => 'dark' as Theme
+  );
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
-  const [mounted, setMounted] = useState(false);
+  const savedTheme = useThemeStorage();
+  const [theme, setThemeState] = useState<Theme>(savedTheme);
 
   useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem("ntm_theme") as Theme;
-    if (saved) {
-      setThemeState(saved);
-      document.documentElement.classList.toggle("light", saved === "light");
-    }
-  }, []);
+    document.documentElement.classList.toggle("light", theme === "light");
+    setLocalStorageTheme(theme);
+  }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem("ntm_theme", newTheme);
-    document.documentElement.classList.toggle("light", newTheme === "light");
   };
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
-
-  if (!mounted) return null;
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>

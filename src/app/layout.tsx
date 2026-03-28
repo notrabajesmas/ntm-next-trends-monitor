@@ -29,11 +29,42 @@ export const metadata: Metadata = {
     default: "NTM - Next Trends Monitor | Tu kit completo de análisis digital",
     template: "%s | NTM",
   },
-  description: "Descubre oportunidades de negocio, detecta tendencias emergentes y audita la presencia digital de cualquier empresa. Todo automatizado con IA.",
-  keywords: ["análisis de mercado", "tendencias", "oportunidades de negocio", "auditoría digital", "IA", "automatización", "business intelligence"],
-  authors: [{ name: "NTM Team" }],
+  description: "Descubre oportunidades de negocio, detecta tendencias emergentes y audita la presencia digital de cualquier empresa. Scanner de negocios, análisis de tendencias y auditorías digitales con inteligencia artificial. Exporta reportes profesionales en PDF y Excel.",
+  keywords: [
+    "análisis de mercado",
+    "tendencias",
+    "oportunidades de negocio",
+    "auditoría digital",
+    "IA",
+    "automatización",
+    "business intelligence",
+    "scanner de negocios",
+    "análisis de competencia",
+    "reportes profesionales",
+    "PDF",
+    "Excel",
+    "Google Places",
+    "SEO",
+    "presencia digital",
+    "market analysis",
+    "trend analysis",
+    "business scanner",
+    "digital audit",
+  ],
+  authors: [{ name: "NTM Team", url: "https://ntm.app" }],
   creator: "NTM",
   publisher: "NTM",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   
   // Favicon and icons
   icons: {
@@ -41,9 +72,13 @@ export const metadata: Metadata = {
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
     ],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    other: [
+      { rel: "mask-icon", url: "/logo-icon.png", color: "#10B981" },
     ],
   },
   
@@ -54,25 +89,38 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_AR",
-    url: "https://ntm-next-trends-monitor.vercel.app",
+    alternateLocale: ["en_US", "pt_BR"],
+    url: "https://ntm.app",
     siteName: "NTM - Next Trends Monitor",
     title: "NTM - Next Trends Monitor | Tu kit completo de análisis digital",
-    description: "Descubre oportunidades de negocio, detecta tendencias emergentes y audita la presencia digital. Todo automatizado con IA.",
+    description: "Descubre oportunidades de negocio, detecta tendencias emergentes y audita la presencia digital. Scanner de negocios, análisis de tendencias y auditorías con IA. Exporta reportes PDF y Excel.",
     images: [
       {
         url: "/icon-512x512.png",
         width: 512,
         height: 512,
-        alt: "NTM Logo",
+        alt: "NTM - Next Trends Monitor Logo",
+        type: "image/png",
+      },
+      {
+        url: "/icon-192x192.png",
+        width: 192,
+        height: 192,
+        alt: "NTM - Next Trends Monitor Logo Small",
+        type: "image/png",
       },
     ],
+    videos: [],
+    audio: [],
   },
   
   // Twitter
   twitter: {
     card: "summary_large_image",
-    title: "NTM - Next Trends Monitor",
-    description: "Tu kit completo de análisis digital automatizado con IA",
+    site: "@ntm_app",
+    creator: "@ntm_app",
+    title: "NTM - Next Trends Monitor | Análisis Digital con IA",
+    description: "Scanner de negocios, análisis de tendencias y auditorías digitales. Exporta reportes profesionales en PDF y Excel.",
     images: ["/icon-512x512.png"],
   },
   
@@ -82,9 +130,22 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "NTM",
+    startupImage: ["/icon-512x512.png"],
   },
   formatDetection: {
     telephone: false,
+    email: false,
+    address: false,
+  },
+  
+  // Additional metadata
+  category: "business",
+  classification: "Business Intelligence",
+  referrer: "origin-when-cross-origin",
+  
+  // Verification (placeholder - user should add real IDs)
+  verification: {
+    google: "google-site-verification-code",
   },
 };
 

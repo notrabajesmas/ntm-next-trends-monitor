@@ -23,6 +23,8 @@ model User {
   stripeCustomerId String?
   stripeSubscriptionId String?
   credits         Int      @default(3) // Créditos gratuitos para empezar
+  emailVerified   DateTime?
+  notifications   Boolean  @default(true) // Recibir notificaciones por email
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   
@@ -30,6 +32,8 @@ model User {
   analysisRequests AnalysisRequest[]
   reports          Report[]
   leads            Lead[]
+  favorites        Favorite[]
+  sharedReports    SharedReport[]
   
   @@map("users")
 }
@@ -183,4 +187,42 @@ model ApiUsage {
   createdAt   DateTime @default(now())
   
   @@map("api_usage")
+}
+
+// ============================================
+// FAVORITOS Y COMPARTIR
+// ============================================
+
+model Favorite {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType    String   // business, report, analysis, lead
+  itemId      String   // ID del item guardado
+  itemData    String   // JSON con los datos del item
+  folder      String?  // Carpeta para organizar
+  notes       String?  // Notas del usuario
+  createdAt   DateTime @default(now())
+  
+  @@unique([userId, itemType, itemId]) // Un item no puede ser favorito 2 veces
+  @@index([userId])
+  @@index([itemType])
+  @@map("favorites")
+}
+
+model SharedReport {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reportType  String   // scanner, auditor, trends, custom
+  title       String
+  content     String   // JSON con el contenido del reporte
+  shareCode   String   @unique // Código para compartir
+  isPublic    Boolean  @default(false)
+  expiresAt   DateTime?
+  viewCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  
+  @@index([shareCode])
+  @@map("shared_reports")
 }
