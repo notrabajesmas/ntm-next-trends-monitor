@@ -1,149 +1,171 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-// Paddle Webhook Handler - Production Ready
-// Maneja todos los eventos de Paddle
-
+// Webhook de Paddle - Se llama automáticamente cuando alguien paga
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Paddle envía eventos con esta estructura
-    const eventType = body.event_type || body.eventType;
-    const data = body.data;
-    
-    console.log(`🛒 Paddle Webhook: ${eventType}`);
+    console.log("[Paddle Webhook] Evento recibido:", JSON.stringify(body, null, 2));
 
+    // Paddle envía diferentes tipos de eventos
+    const eventType = body.event_type || body.alert_name || body.event_type;
+    const data = body.data || body;
+
+    // Procesar según el tipo de evento
     switch (eventType) {
-      case "transaction.completed":
-        await handleTransactionCompleted(data);
+      case 'transaction.completed':
+      case 'payment_succeeded':
+      case 'subscription_created':
+      case 'subscription_updated':
+        await handlePaymentSuccess(data);
         break;
-        
-      case "subscription.created":
-        await handleSubscriptionCreated(data);
-        break;
-        
-      case "subscription.updated":
-        await handleSubscriptionUpdated(data);
-        break;
-        
-      case "subscription.cancelled":
-      case "subscription.canceled":
+      
+      case 'subscription_cancelled':
+      case 'subscription_expired':
         await handleSubscriptionCancelled(data);
         break;
-        
-      case "subscription.past_due":
-        await handleSubscriptionPastDue(data);
+      
+      case 'subscription_renewed':
+        await handleSubscriptionRenewed(data);
         break;
-        
+      
       default:
-        console.log(`Unhandled event type: ${eventType}`);
+        console.log(`[Paddle Webhook] Evento no manejado: ${eventType}`);
     }
 
     return NextResponse.json({ 
-      success: true,
-      processed: true,
-      event: eventType 
+      success: true, 
+      message: "Webhook processed",
+      eventType 
     });
 
   } catch (error) {
-    console.error("❌ Paddle webhook error:", error);
+    console.error("[Paddle Webhook] Error:", error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: "Webhook processing failed" 
-      },
+      { success: false, error: String(error) },
       { status: 500 }
     );
   }
 }
 
-async function handleTransactionCompleted(data: any) {
+async function handlePaymentSuccess(data: any) {
   try {
-    const customData = data.custom_data || data.customData || {};
-    const email = data.customer?.email || data.billing?.email;
-    const transactionId = data.id;
-    
-    console.log(`✅ Transaction completed: ${transactionId}`);
-    console.log(`   Email: ${email}`);
-    console.log(`   Custom data:`, customData);
+    // Obtener email del cliente
+    const customerEmail = data.customer?.email || 
+                          data.passthrough || 
+                          data.custom_data?.email ||
+                          extractEmailFromPassthrough(data.passthrough);
 
-    // Si tenemos userId, actualizar el usuario
-    if (customData.userId) {
-      await db.user.update({
-        where: { id: customData.userId },
-        data: {
-          planType: customData.planType || "pro",
-          credits: 100,
-          stripeCustomerId: data.customer_id || data.customer?.id,
-          stripeSubscriptionId: data.subscription_id || data.subscription?.id,
-          updatedAt: new Date()
-        }
-      });
-      console.log(`   User updated: ${customData.userId}`);
-    } else if (email) {
-      // Buscar usuario por email y actualizar
-      const user = await db.user.findUnique({
-        where: { email }
-      });
-      
-      if (user) {
-        await db.user.update({
-          where: { email },
-          data: {
-            planType: customData.planType || "pro",
-            credits: 100,
-            stripeCustomerId: data.customer_id || data.customer?.id,
-            stripeSubscriptionId: data.subscription_id || data.subscription?.id,
-            updatedAt: new Date()
-          }
-        });
-        console.log(`   User updated by email: ${email}`);
-      }
+    if (!customerEmail) {
+      console.error("[Paddle] No se encontró email del cliente");
+      return;
     }
+
+    // Determinar el plan basado en el price_id o product_id
+    const priceId = data.items?.[0]?.price?.id || 
+                    data.price_id || 
+                    data.product_id;
+    
+    let planType = 'pro';
+    let credits = 100;
+
+    if (priceId?.includes('enterprise') || priceId === 'pri_01km5a65d2t8jy65s00qkscpa1') {
+      planType = 'enterprise';
+      credits = -1; // Ilimitado
+    } else if (priceId?.includes('pro') || priceId === 'pri_01km5a0xnesah58qp21ekn4xrr') {
+      planType = 'pro';
+      credits = 100;
+    }
+
+    console.log(`[Paddle] Actualizando usuario: ${customerEmail} → ${planType} (${credits} créditos)`);
+
+    // Actualizar o crear usuario
+    const user = await db.user.upsert({
+      where: { email: customerEmail.toLowerCase() },
+      update: {
+        planType,
+        credits
+      },
+      create: {
+        email: customerEmail.toLowerCase(),
+        name: data.customer?.name || customerEmail.split('@')[0],
+        password: 'paddle_user_' + Date.now(), // Placeholder, no se usará
+        planType,
+        credits
+      }
+    });
+
+    console.log(`[Paddle] Usuario actualizado: ${user.email} → ${user.planType}`);
+
   } catch (error) {
-    console.error("Error in handleTransactionCompleted:", error);
+    console.error("[Paddle] Error en handlePaymentSuccess:", error);
+    throw error;
   }
-}
-
-async function handleSubscriptionCreated(data: any) {
-  console.log(`📝 Subscription created: ${data.id}`);
-}
-
-async function handleSubscriptionUpdated(data: any) {
-  console.log(`🔄 Subscription updated: ${data.id}`);
 }
 
 async function handleSubscriptionCancelled(data: any) {
   try {
-    const customData = data.custom_data || data.customData || {};
+    const customerEmail = data.customer?.email;
     
-    // Revertir a plan free
-    if (customData.userId) {
-      await db.user.update({
-        where: { id: customData.userId },
-        data: {
-          planType: "free",
-          credits: 3,
-          updatedAt: new Date()
-        }
-      });
-      console.log(`❌ Subscription cancelled, user reverted: ${customData.userId}`);
-    }
+    if (!customerEmail) return;
+
+    // Degradar a plan gratuito
+    await db.user.update({
+      where: { email: customerEmail.toLowerCase() },
+      data: {
+        planType: 'free',
+        credits: 3
+      }
+    });
+
+    console.log(`[Paddle] Suscripción cancelada: ${customerEmail} → free`);
+
   } catch (error) {
-    console.error("Error in handleSubscriptionCancelled:", error);
+    console.error("[Paddle] Error en handleSubscriptionCancelled:", error);
   }
 }
 
-async function handleSubscriptionPastDue(data: any) {
-  console.log(`⚠️ Subscription past due: ${data.id}`);
+async function handleSubscriptionRenewed(data: any) {
+  try {
+    const customerEmail = data.customer?.email;
+    const priceId = data.items?.[0]?.price?.id;
+    
+    if (!customerEmail) return;
+
+    // Resetear créditos según el plan
+    const credits = priceId?.includes('enterprise') ? -1 : 100;
+    
+    await db.user.update({
+      where: { email: customerEmail.toLowerCase() },
+      data: { credits }
+    });
+
+    console.log(`[Paddle] Suscripción renovada: ${customerEmail} → ${credits} créditos`);
+
+  } catch (error) {
+    console.error("[Paddle] Error en handleSubscriptionRenewed:", error);
+  }
 }
 
-// Health check
-export async function GET(request: NextRequest) {
-  return NextResponse.json({ 
-    status: "ok",
-    service: "Paddle Webhook - NTM",
+function extractEmailFromPassthrough(passthrough: string | undefined): string | null {
+  if (!passthrough) return null;
+  
+  try {
+    // Intentar parsear como JSON
+    const parsed = JSON.parse(passthrough);
+    return parsed.email || parsed.user_email || null;
+  } catch {
+    // Si no es JSON, buscar patrón de email
+    const emailMatch = passthrough.match(/[\w.-]+@[\w.-]+\.\w+/);
+    return emailMatch ? emailMatch[0] : null;
+  }
+}
+
+// GET para verificar que el webhook funciona
+export async function GET() {
+  return NextResponse.json({
+    status: "Paddle webhook active",
     timestamp: new Date().toISOString()
   });
 }

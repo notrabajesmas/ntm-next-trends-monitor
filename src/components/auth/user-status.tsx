@@ -8,7 +8,9 @@ import {
   LogOut, 
   Crown,
   Zap,
-  Loader2
+  Loader2,
+  Sun,
+  Moon
 } from "lucide-react";
 import { AuthModal } from "./auth-modal";
 
@@ -26,38 +28,56 @@ export function UserStatus() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("pro");
   const [loggingOut, setLoggingOut] = useState(false);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
     checkSession();
+    
+    // Leer tema guardado
+    const savedTheme = localStorage.getItem('ntm_theme') as 'dark' | 'light' | null;
+    if (savedTheme) setTheme(savedTheme);
   }, []);
 
-  // Verificar sesión cada 30 segundos
+  // Actualizar créditos periódicamente
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!authModalOpen) {
-        checkSession();
-      }
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [authModalOpen]);
+    if (user) {
+      const interval = setInterval(() => {
+        fetchCredits();
+      }, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   const checkSession = async () => {
     try {
       const response = await fetch("/api/auth/me", {
-        credentials: 'include' // Importante para enviar cookies
+        credentials: 'include'
       });
       const data = await response.json();
       
       if (data.authenticated && data.user) {
         setUser(data.user);
+        setCredits(data.user.credits);
       } else {
         setUser(null);
       }
-    } catch (error) {
-      console.error("Session check error:", error);
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCredits = async () => {
+    try {
+      const response = await fetch("/api/credits", { credentials: 'include' });
+      const data = await response.json();
+      if (data.authenticated) {
+        setCredits(data.credits);
+      }
+    } catch {
+      // Ignorar errores de créditos
     }
   };
 
@@ -69,10 +89,9 @@ export function UserStatus() {
         credentials: 'include'
       });
       setUser(null);
-      // Recargar la página para limpiar cualquier estado
       window.location.href = '/';
-    } catch (error) {
-      console.error("Logout error:", error);
+    } catch {
+      // Error silencioso
     } finally {
       setLoggingOut(false);
     }
@@ -82,6 +101,16 @@ export function UserStatus() {
     setSelectedPlan(plan);
     setAuthModalOpen(true);
   };
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('ntm_theme', newTheme);
+    document.documentElement.classList.toggle('light', newTheme === 'light');
+  };
+
+  const displayCredits = credits ?? user?.credits ?? 0;
+  const hasUnlimited = user?.planType === 'enterprise';
 
   if (loading) {
     return (
@@ -95,6 +124,16 @@ export function UserStatus() {
     return (
       <>
         <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="text-slate-400 hover:text-white"
+            onClick={toggleTheme}
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </Button>
+          
           <Button 
             variant="outline" 
             className="border-slate-600 text-slate-300 hover:text-white hidden sm:flex"
@@ -119,7 +158,9 @@ export function UserStatus() {
           open={authModalOpen} 
           onOpenChange={setAuthModalOpen}
           selectedPlan={selectedPlan}
-          onAuthSuccess={checkSession}
+          onAuthSuccess={() => {
+            checkSession();
+          }}
         />
       </>
     );
@@ -127,12 +168,25 @@ export function UserStatus() {
 
   return (
     <div className="flex items-center gap-2 sm:gap-3">
+      {/* Theme Toggle */}
+      <Button 
+        variant="ghost" 
+        size="sm"
+        className="text-slate-400 hover:text-white"
+        onClick={toggleTheme}
+      >
+        {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+      </Button>
+
       {/* Créditos */}
       <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-lg">
-        <Zap className="w-4 h-4 text-yellow-400" />
+        <Zap className={`w-4 h-4 ${displayCredits <= 3 && !hasUnlimited ? 'text-red-400' : 'text-yellow-400'}`} />
         <span className="text-sm text-slate-300">
-          {user.credits === -1 ? "∞" : user.credits} créditos
+          {hasUnlimited ? "∞" : displayCredits}
         </span>
+        {!hasUnlimited && displayCredits <= 3 && (
+          <span className="text-xs text-red-400">!</span>
+        )}
       </div>
 
       {/* Plan Badge */}
@@ -146,24 +200,16 @@ export function UserStatus() {
         {user.planType.toUpperCase()}
       </Badge>
 
-      {/* User Info */}
-      <div className="flex items-center gap-2">
-        <div className="hidden sm:block text-right">
-          <p className="text-sm font-medium text-white">
-            {user.name || user.email.split('@')[0]}
-          </p>
-          <p className="text-xs text-slate-400">{user.email}</p>
-        </div>
-        <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center font-bold text-slate-900">
-          {(user.name || user.email)[0].toUpperCase()}
-        </div>
+      {/* User Avatar */}
+      <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center font-bold text-slate-900 text-sm">
+        {(user.name || user.email)[0].toUpperCase()}
       </div>
 
-      {/* Logout Button - Más visible */}
+      {/* Logout */}
       <Button 
         variant="outline" 
         size="sm"
-        className="border-red-500/30 text-red-400 hover:text-red-300 hover:bg-red-500/10 hover:border-red-500/50"
+        className="border-red-500/30 text-red-400 hover:text-red-300 hover:bg-red-500/10"
         onClick={handleLogout}
         disabled={loggingOut}
       >

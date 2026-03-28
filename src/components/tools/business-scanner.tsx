@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Select, 
   SelectContent, 
@@ -21,13 +22,15 @@ import {
   Phone, 
   Star, 
   AlertTriangle,
-  CheckCircle,
   XCircle,
   Loader2,
   Download,
   Eye,
   ExternalLink,
-  Shield
+  Shield,
+  Zap,
+  Clock,
+  CheckCircle
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -37,13 +40,14 @@ interface BusinessResult {
   address: string;
   phone?: string;
   website?: string;
-  rating?: number;
+  rating?: number | string;
   reviewCount?: number;
   hasWebsite: boolean;
-  hasClaimed: boolean;
   issues: string[];
   businessType: string;
   source?: string;
+  isOpen?: boolean;
+  distance?: number;
 }
 
 interface BusinessScannerProps {
@@ -57,6 +61,8 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
   const [results, setResults] = useState<BusinessResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessResult | null>(null);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleSearch = async () => {
     if (!location.trim()) {
@@ -69,10 +75,27 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
     }
 
     setIsLoading(true);
+    setIsAnimating(true);
     setHasSearched(true);
     setSelectedBusiness(null);
 
     try {
+      // Verificar créditos primero
+      const creditsRes = await fetch("/api/credits");
+      const creditsData = await creditsRes.json();
+      
+      if (creditsData.credits === 0 && !creditsData.hasUnlimited) {
+        toast({
+          title: "Sin créditos",
+          description: "Has agotado tus créditos. Actualiza tu plan para continuar.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        setIsAnimating(false);
+        return;
+      }
+
+      // Ejecutar búsqueda
       const response = await fetch("/api/scan-businesses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -88,34 +111,58 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
           address: b.address as string,
           phone: b.phone as string | undefined,
           website: b.website as string | undefined,
-          rating: b.rating as number | undefined,
+          rating: b.rating as number | string | undefined,
           reviewCount: b.reviewCount as number | undefined,
           hasWebsite: !!b.website,
-          hasClaimed: false,
           issues: (b.issues as string[]) || [],
           businessType: b.businessType as string,
-          source: b.source as string | undefined
+          source: b.source as string | undefined,
+          isOpen: b.isOpen as boolean | undefined,
+          distance: b.distance as number | undefined
         }));
         
         setResults(businesses);
+        
+        // Actualizar créditos restantes
+        if (creditsData.hasUnlimited) {
+          setCredits(-1);
+        } else {
+          setCredits((prev) => (prev !== null ? prev - 1 : creditsData.credits - 1));
+        }
+        
+        // Guardar en historial
+        fetch("/api/history/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            toolType: "scanner",
+            inputData: { location, businessType },
+            rawData: data.data
+          })
+        });
+        
+        const hasRealData = data.data.hasRealData;
         toast({
-          title: "¡Análisis completado!",
-          description: `Se encontraron ${businesses.length} negocios con oportunidades`,
+          title: hasRealData ? "¡Datos reales encontrados!" : "Análisis completado",
+          description: hasRealData 
+            ? `${businesses.length} negocios encontrados con datos reales`
+            : `${businesses.length} sugerencias generadas`,
         });
       } else {
-        throw new Error("Invalid response");
+        throw new Error(data.error || "Error en la búsqueda");
       }
     } catch (error) {
       console.error("Search error:", error);
       toast({
-        title: "Error en la búsqueda",
-        description: "No se pudo completar el análisis. Intenta de nuevo.",
+        title: "Error",
+        description: "No se pudo completar el análisis",
         variant: "destructive"
       });
       setResults([]);
     }
 
     setIsLoading(false);
+    setTimeout(() => setIsAnimating(false), 500);
   };
 
   const handleViewMore = (business: BusinessResult) => {
@@ -123,15 +170,9 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
   };
 
   const handleAuditBusiness = (business: BusinessResult) => {
-    // Notificar al componente padre para cambiar a la tab de Auditor
     if (onAuditBusiness) {
       onAuditBusiness(business.name, business.website);
     }
-    
-    toast({
-      title: "Auditoría Digital",
-      description: `Iniciando auditoría para "${business.name}"...`,
-    });
   };
 
   const handleSearchInGoogle = (business: BusinessResult) => {
@@ -142,14 +183,13 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
   const handleExportCSV = () => {
     if (results.length === 0) return;
     
-    const headers = ['Nombre', 'Dirección', 'Teléfono', 'Website', 'Rating', 'Reseñas', 'Tipo', 'Problemas'];
+    const headers = ['Nombre', 'Dirección', 'Teléfono', 'Website', 'Rating', 'Tipo', 'Problemas'];
     const rows = results.map(b => [
       b.name,
       b.address,
       b.phone || 'N/A',
       b.website || 'Sin sitio web',
       b.rating?.toString() || 'N/A',
-      b.reviewCount?.toString() || 'N/A',
       b.businessType,
       b.issues.join('; ')
     ]);
@@ -168,13 +208,6 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
     });
   };
 
-  const getIssueBadge = (issue: string) => {
-    if (issue.includes("Sin sitio web")) return "destructive";
-    if (issue.includes("no reclamado")) return "warning";
-    if (issue.includes("Rating")) return "secondary";
-    return "outline";
-  };
-
   return (
     <div className="grid lg:grid-cols-3 gap-6">
       {/* Panel de Búsqueda */}
@@ -185,7 +218,7 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
             Scanner de Negocios
           </CardTitle>
           <CardDescription className="text-slate-400">
-            Encuentra negocios sin presencia digital en cualquier zona
+            Encuentra negocios con oportunidades digitales
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -196,11 +229,11 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
             </Label>
             <Input
               id="location"
-              placeholder="Ej: Palermo, Buenos Aires"
+              placeholder="Ej: Madrid, España"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+              className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20"
             />
           </div>
 
@@ -219,7 +252,6 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
                 <SelectItem value="store">Tiendas</SelectItem>
                 <SelectItem value="service">Servicios</SelectItem>
                 <SelectItem value="health">Salud</SelectItem>
-                <SelectItem value="fitness">Fitness</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -227,12 +259,12 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
           <Button 
             onClick={handleSearch}
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white"
+            className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white relative overflow-hidden"
           >
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analizando zona...
+                Analizando...
               </>
             ) : (
               <>
@@ -240,15 +272,20 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
                 Analizar Zona
               </>
             )}
+            {isAnimating && (
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            )}
           </Button>
 
-          {/* Info Box */}
-          <div className="mt-4 p-3 bg-slate-900/50 rounded-lg border border-slate-700/50">
-            <p className="text-xs text-slate-400">
-              <AlertTriangle className="w-3 h-3 inline mr-1 text-amber-400" />
-              Este análisis consume <strong className="text-white">1 crédito</strong>. 
-              Los resultados incluyen fuentes para verificar.
-            </p>
+          {/* Créditos */}
+          <div className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg border border-slate-700/50">
+            <span className="text-xs text-slate-400">
+              <Zap className="w-3 h-3 inline mr-1 text-yellow-400" />
+              Este análisis usa 1 crédito
+            </span>
+            <Badge variant="outline" className="text-emerald-400 border-emerald-400/30">
+              {credits === -1 ? "∞" : credits !== null ? credits : "--"}
+            </Badge>
           </div>
         </CardContent>
       </Card>
@@ -257,161 +294,156 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
       <Card className="bg-slate-800/50 border-slate-700/50 lg:col-span-2">
         <CardHeader>
           <CardTitle className="text-white flex items-center justify-between">
-            <span>Resultados del Análisis</span>
+            <span>Resultados</span>
             {results.length > 0 && (
               <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
-                {results.length} oportunidades
+                {results.length} encontrados
               </Badge>
             )}
           </CardTitle>
-          <CardDescription className="text-slate-400">
-            Negocios detectados con oportunidades de mejora digital
-          </CardDescription>
         </CardHeader>
         <CardContent>
           {!hasSearched ? (
             <div className="text-center py-12">
               <Search className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-slate-400">
-                Ingresa una zona geográfica para comenzar el análisis
-              </p>
-              <p className="text-sm text-slate-500 mt-2">
-                Detectaremos negocios sin sitio web, sin presencia digital o con problemas
-              </p>
+              <p className="text-slate-400">Ingresa una zona para comenzar</p>
             </div>
           ) : isLoading ? (
-            <div className="text-center py-12">
-              <Loader2 className="w-12 h-12 text-emerald-400 mx-auto mb-4 animate-spin" />
-              <p className="text-slate-400">Analizando negocios en {location}...</p>
-              <p className="text-sm text-slate-500 mt-2">
-                Esto puede tomar unos segundos
-              </p>
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="p-4 bg-slate-900/50 rounded-lg space-y-3">
+                  <Skeleton className="h-4 w-3/4 bg-slate-700" />
+                  <Skeleton className="h-3 w-1/2 bg-slate-700" />
+                  <Skeleton className="h-3 w-1/4 bg-slate-700" />
+                </div>
+              ))}
             </div>
           ) : results.length === 0 ? (
             <div className="text-center py-12">
               <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
               <p className="text-slate-400">No se encontraron resultados</p>
-              <p className="text-sm text-slate-500 mt-2">
-                Intenta con otra zona o tipo de negocio
-              </p>
             </div>
           ) : (
             <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-              {results.map((business) => (
-                <div key={business.id}>
-                  <div 
-                    className={`p-4 bg-slate-900/50 rounded-lg border transition-colors ${
-                      selectedBusiness?.id === business.id 
-                        ? 'border-emerald-500/50' 
-                        : 'border-slate-700/50 hover:border-slate-600'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-white">{business.name}</h4>
-                          {business.hasWebsite ? (
-                            <Badge variant="outline" className="text-xs text-emerald-400 border-emerald-400/30">
-                              <Globe className="w-3 h-3 mr-1" />
-                              Web
-                            </Badge>
-                          ) : (
-                            <Badge variant="destructive" className="text-xs">
-                              <XCircle className="w-3 h-3 mr-1" />
-                              Sin Web
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        <p className="text-sm text-slate-400 flex items-center gap-1 mb-2">
-                          <MapPin className="w-3 h-3" />
-                          {business.address}
-                        </p>
-                        
-                        <div className="flex items-center gap-4 text-xs text-slate-500 mb-3">
-                          {business.phone && (
-                            <span className="flex items-center gap-1">
-                              <Phone className="w-3 h-3" />
-                              {business.phone}
-                            </span>
-                          )}
-                          {business.rating && (
-                            <span className="flex items-center gap-1">
-                              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                              {business.rating} ({business.reviewCount} reseñas)
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex flex-wrap gap-1">
-                          {business.issues.slice(0, 3).map((issue, idx) => (
-                            <Badge 
-                              key={idx} 
-                              variant={getIssueBadge(issue) as "destructive" | "secondary" | "outline"}
-                              className="text-xs"
-                            >
-                              {issue}
-                            </Badge>
-                          ))}
-                          {business.issues.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{business.issues.length - 3} más
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="border-slate-600 text-slate-300 hover:text-white"
-                          onClick={() => handleViewMore(business)}
-                        >
-                          <Eye className="w-3 h-3 mr-1" />
-                          {selectedBusiness?.id === business.id ? 'Ocultar' : 'Ver más'}
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    {/* Panel expandido con más opciones */}
-                    {selectedBusiness?.id === business.id && (
-                      <div className="mt-4 pt-4 border-t border-slate-700/50">
-                        <div className="grid sm:grid-cols-2 gap-3">
-                          <Button 
-                            size="sm"
-                            className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
-                            onClick={() => handleAuditBusiness(business)}
-                          >
-                            <Shield className="w-4 h-4 mr-2" />
-                            Auditar Presencia Digital
-                          </Button>
-                          <Button 
-                            size="sm"
-                            variant="outline"
-                            className="border-slate-600 text-slate-300"
-                            onClick={() => handleSearchInGoogle(business)}
-                          >
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            Buscar en Google
-                          </Button>
-                        </div>
-                        
-                        {business.source && (
-                          <div className="mt-3 p-2 bg-slate-800/50 rounded text-xs text-slate-400">
-                            <strong>Fuente:</strong>{' '}
-                            <a href={business.source} target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline">
-                              {business.source}
-                            </a>
-                          </div>
+              {results.map((business, index) => (
+                <div 
+                  key={business.id}
+                  className={`p-4 bg-slate-900/50 rounded-lg border transition-all duration-300 ${
+                    selectedBusiness?.id === business.id 
+                      ? 'border-emerald-500/50 ring-1 ring-emerald-500/20' 
+                      : 'border-slate-700/50 hover:border-slate-600'
+                  }`}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h4 className="font-semibold text-white truncate">{business.name}</h4>
+                        {business.isOpen !== undefined && (
+                          <Badge className={`text-xs ${business.isOpen ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                            {business.isOpen ? 'Abierto' : 'Cerrado'}
+                          </Badge>
+                        )}
+                        {business.hasWebsite ? (
+                          <Badge variant="outline" className="text-xs text-emerald-400 border-emerald-400/30">
+                            <Globe className="w-3 h-3 mr-1" />
+                            Web
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive" className="text-xs">
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Sin Web
+                          </Badge>
                         )}
                       </div>
-                    )}
+                      
+                      <p className="text-sm text-slate-400 flex items-center gap-1 mb-2">
+                        <MapPin className="w-3 h-3 flex-shrink-0" />
+                        <span className="truncate">{business.address}</span>
+                      </p>
+                      
+                      <div className="flex items-center gap-4 text-xs text-slate-500 mb-3 flex-wrap">
+                        {business.phone && (
+                          <span className="flex items-center gap-1">
+                            <Phone className="w-3 h-3" />
+                            {business.phone}
+                          </span>
+                        )}
+                        {business.rating && (
+                          <span className="flex items-center gap-1">
+                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                            {business.rating} ({business.reviewCount} reseñas)
+                          </span>
+                        )}
+                        {business.distance && (
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {business.distance}m
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap gap-1">
+                        {business.issues.slice(0, 3).map((issue, idx) => (
+                          <Badge 
+                            key={idx} 
+                            variant="outline"
+                            className="text-xs text-slate-300 border-slate-600"
+                          >
+                            {issue}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-slate-600 text-slate-300 hover:text-white hover:border-emerald-500"
+                      onClick={() => handleViewMore(business)}
+                    >
+                      <Eye className="w-3 h-3 mr-1" />
+                      {selectedBusiness?.id === business.id ? 'Ocultar' : 'Ver más'}
+                    </Button>
                   </div>
+                  
+                  {/* Panel expandido */}
+                  {selectedBusiness?.id === business.id && (
+                    <div className="mt-4 pt-4 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <Button 
+                          size="sm"
+                          className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
+                          onClick={() => handleAuditBusiness(business)}
+                        >
+                          <Shield className="w-4 h-4 mr-2" />
+                          Auditar Digital
+                        </Button>
+                        <Button 
+                          size="sm"
+                          variant="outline"
+                          className="border-slate-600 text-slate-300"
+                          onClick={() => handleSearchInGoogle(business)}
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Buscar en Google
+                        </Button>
+                      </div>
+                      
+                      {business.source && (
+                        <div className="mt-3 p-2 bg-slate-800/50 rounded text-xs text-slate-400">
+                          <strong>Fuente:</strong>{' '}
+                          <a href={business.source} target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline">
+                            {business.source}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
               
-              {/* Export Actions */}
+              {/* Export */}
               <div className="flex gap-2 pt-4 border-t border-slate-700/50">
                 <Button 
                   variant="outline" 
@@ -421,15 +453,7 @@ export function BusinessScanner({ onAuditBusiness }: BusinessScannerProps) {
                   <Download className="w-4 h-4 mr-2" />
                   Exportar CSV
                 </Button>
-                <Button 
-                  className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
-                  onClick={() => {
-                    toast({
-                      title: "Generando PDF",
-                      description: "El reporte se está generando...",
-                    });
-                  }}
-                >
+                <Button className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
                   <Download className="w-4 h-4 mr-2" />
                   Generar PDF
                 </Button>
